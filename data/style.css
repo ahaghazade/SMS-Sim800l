@@ -1,0 +1,45 @@
+html {font-family: Arial; display: inline-block; text-align: center;}
+p {  font-size: 1.2rem;}
+body {  margin: 0;}
+.topnav { overflow: hidden; background-color: #2f4468; color: white; font-size: 1.7rem; z-index: 2;position: absolute;top: 7%;left: 50%;width: 97%;transform: translate(-50%, -50%);}
+.content { padding: 20px; }
+.card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); }
+.cards { max-width: 1000px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.reading { font-size: 1.5rem; }
+.packet { color: #bebebe; }
+.card.temperature { color: #612b02; }
+.card.humidity { color: #003068; }
+.card.pressure { color: #007377; }
+.bg-image {
+    /* The image used */
+    background-image: url("iot.jpg");
+  
+    /* Add the blur effect */
+    filter: blur(8px);
+    -webkit-filter: blur(8px);
+  
+    /* Full height */
+    height: 100%;
+  
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -1;
+  }
+body, html {
+height: 100%;
+margin: 0;
+font-family: Arial, Helvetica, sans-serif;
+}
+.bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 97%;
+    padding: 20px;
+    padding-top: 7%;
+    text-align: center;
+  }
