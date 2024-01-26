@@ -1,17 +1,100 @@
 #include <Arduino.h>
+#include <SimCommands.h>
+
+int CommandAttempts = 3;
+String MobilePhone = "09024674437";
 
 void updateSerial();
 void test_sim800_module();
 void send_SMS();
 
+void SendReqtoSim(String Command, String DesiredRes)
+{
+  boolean at_flag = 1;
+  int Attempts = 0;
+  while (at_flag && Attempts < CommandAttempts)
+  {
+    Attempts++;
+    Serial.printf("\nSending %s  ...(%d)\n", Command.c_str(), Attempts);
+    delay(10);
+    Serial2.println(Command);
+    delay(100);
+    while (Serial2.available() > 0)
+    {
+      if (Serial2.find(DesiredRes.c_str())) at_flag = 0;
+    }
+    delay(1000);
+  }
+  if (at_flag == 1)
+  {
+    Serial.printf("Request %s : Failed!\n", Command.c_str());
+    //restart ESP or Sim800
+  }
+  else Serial.printf("Request %s : Success.\n", Command.c_str());
+}
+
+void sendSMS(String MobilePhoneNum, String Payload)
+{
+  String PhoneNumPrefex = "\"" + MobilePhoneNum + "\"";
+  // Set TextMode
+  Serial.println("\nSetting Text mode");
+  SendReqtoSim(SetTextMode, ATOK);
+  delay(100);
+  // Set Phone Number
+  SendReqtoSim(SetPhoneNum + PhoneNumPrefex, SMSStart);
+  //send payload
+  Serial.printf("\nSending sms payload - %s - \n\n", Payload.c_str());
+  Serial2.print(Payload);
+  delay(100);
+  //send ctrl+z
+  boolean at_flag = 1;
+  int Attempts = 0;
+  while (at_flag && Attempts < CommandAttempts)
+  {
+    Attempts++;
+    Serial2.println((char)26);
+    Serial.printf("Sending Ctrl+z...(%d)\n", Attempts);
+    delay(100);
+    while (Serial2.available() > 0)
+    {
+      if (Serial2.find(SMSSent)) at_flag = 0;
+    }
+    delay(500);
+  }
+  delay(1000);
+  Serial.println("SMS Send Status: Success");
+}
+
+void callMe(String Num)
+{
+  Serial2.print(F("ATD"));
+  Serial2.print(Num);
+  Serial2.print(F(";\r\n"));
+}
+
+void GSM_Init()
+{
+  Serial.println("Finding SIM800 GSM...");
+  // Check connection
+  SendReqtoSim(AT, ATOK);
+  // ECO Disabling Mode
+  // SendReqtoSim(EchoDisable, ATOK);
+  // CPIN?
+  SendReqtoSim(CheckPin, PinReady);
+  //Irancell
+  SendReqtoSim(IRANCELL, ATOK);
+}
+
 
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(4800);
+  Serial2.begin(9600);
   delay(3000);
   Serial.println("Starting...");
-  test_sim800_module();
-  send_SMS();
+  // test_sim800_module();
+  GSM_Init();
+  delay(100);
+  sendSMS(MobilePhone, "Hello Test");
 }
 void loop() {
   updateSerial();
@@ -45,16 +128,4 @@ void updateSerial()
   {
     Serial.write(Serial2.read());//Forward what Software Serial received to Serial Port
   }
-}
-void send_SMS()
-{
-  Serial2.println("AT+CMGF=1"); // Configuring TEXT mode
-  updateSerial();
-  Serial2.println("AT+CMGS= \"+989127176496\"");//change ZZ with country code and xxxxxxxxxxx with phone number to sms
-  updateSerial();
-  Serial2.print("Circuit Digest"); //text content
-  updateSerial();
-  Serial.println();
-  Serial.println("Message Sent");
-  Serial2.write(26);
 }
