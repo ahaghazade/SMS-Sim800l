@@ -1,0 +1,12 @@
+#define ATOK        "OK"
+#define ERROR       "Error"
+#define AT          "AT"
+#define EchoDisable "ATE0"
+#define SetTextMode "AT+CMGF=1"
+#define SetPhoneNum "AT+CMGS="
+#define IRANCELL    "AT+CSMP=17,167,0,8"
+#define CheckPin    "AT+CPIN?"
+#define PinReady     "+CPIN: READY"
+#define SMSStart    ">"
+#define SMSSent     "+CMGS:"
+#define CtrlZ       (char)26
